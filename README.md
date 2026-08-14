@@ -1,11 +1,18 @@
-# image-vision-mcp · 识图 MCP（零依赖）
+# DSH-vision-mcp · 识图 MCP（零依赖）
+
+[![npm version](https://img.shields.io/npm/v/dsh-vision-mcp)](https://www.npmjs.com/package/dsh-vision-mcp)
+[![npm downloads](https://img.shields.io/npm/dm/dsh-vision-mcp)](https://www.npmjs.com/package/dsh-vision-mcp)
+[![license](https://img.shields.io/npm/l/dsh-vision-mcp)](LICENSE)
+[![node](https://img.shields.io/badge/node-%3E%3D18-339933)](https://nodejs.org)
+[![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)](package.json)
+[![GitHub stars](https://img.shields.io/github/stars/moton16/dsh-vision-mcp)](https://github.com/moton16/dsh-vision-mcp)
 
 给**本身不支持图片输入**的模型（DeepSeek、纯文本模型等）装上"眼睛"的 MCP 服务器。
 
-主模型调用 MCP 工具 `read_image` → 服务器读取图片（本地路径 / URL / data URL / base64）→ 转发给外部 **OpenAI 兼容视觉 API**（GPT-4o、Qwen-VL、GLM-4V、本地 Ollama 等）→ 把视觉模型返回的**文字描述**交回主模型继续推理。
+主模型调用 MCP 工具 `img2text` → 服务器读取图片（本地路径 / URL / data URL / base64）→ 转发给外部 **OpenAI 兼容视觉 API**（GPT-4o、Qwen-VL、GLM-4V、本地 Ollama 等）→ 把视觉模型返回的**文字描述**交回主模型继续推理。
 
 ```
-主模型(纯文本)  --read_image(image, prompt)-->  image-vision-mcp
+主模型(纯文本)  --img2text(image, prompt)-->  dsh-vision-mcp
                                                    │ 读取图片 → base64
                                                    ▼
                                           外部视觉 API（VISION_API_BASE + VISION_MODEL）
@@ -22,22 +29,22 @@
 
 ```bash
 # 方式一：npm 全局安装（发布到 npm 后）
-npm i -g image-vision-mcp
+npm i -g dsh-vision-mcp
 
 # 方式二：直接从 GitHub 安装（无需等 npm 发布）
-npm i -g github:你的用户名/image-vision-mcp
+npm i -g github:你的用户名/dsh-vision-mcp
 
 # 方式三：不安装，临时跑（npx）
-npx image-vision-mcp
+npx dsh-vision-mcp
 ```
 
-安装后生成 `image-vision-mcp` 命令，在任意 MCP 客户端里这样配置：
+安装后生成 `dsh-vision-mcp` 命令，在任意 MCP 客户端里这样配置：
 
 ```json
 {
   "mcpServers": {
-    "image-vision": {
-      "command": "image-vision-mcp",
+    "dsh-vision": {
+      "command": "dsh-vision-mcp",
       "env": {
         "VISION_PROVIDERS": "[{\"name\":\"qwen\",\"base\":\"https://dashscope.aliyuncs.com/compatible-mode/v1\",\"model\":\"qwen3-vl-flash\",\"apiKey\":\"sk-xxx\"}]"
       }
@@ -53,7 +60,7 @@ npx image-vision-mcp
 | 文件 | 说明 |
 |------|------|
 | `server.js` | MCP 服务器本体（stdio 传输，零依赖，含 bin 入口） |
-| `package.json` | npm 包定义（`bin: image-vision-mcp`） |
+| `package.json` | npm 包定义（`bin: dsh-vision-mcp`） |
 | `mock-api.js` | 本地 mock 视觉 API（测试用，不真看图） |
 | `test-client.js` | MCP 协议端到端测试客户端 |
 | `concurrent-test.js` | 并发请求测试 |
@@ -90,7 +97,7 @@ node test-client.js .\test.png
 ### Claude Code
 
 ```bash
-claude mcp add image-vision -- node /绝对路径/server.js
+claude mcp add dsh-vision -- node /绝对路径/server.js
 ```
 
 或写入 MCP 配置文件（`~/.claude.json` / 项目 `.mcp.json`）：
@@ -98,9 +105,9 @@ claude mcp add image-vision -- node /绝对路径/server.js
 ```json
 {
   "mcpServers": {
-    "image-vision": {
+    "dsh-vision": {
       "command": "node",
-      "args": ["E:/Softwares/dsh-cli/Working/image-vision-mcp/server.js"],
+      "args": ["E:/Softwares/dsh-cli/Working/dsh-vision-mcp/server.js"],
       "env": {
         "VISION_API_BASE": "https://api.openai.com/v1",
         "VISION_MODEL": "gpt-4o",
@@ -118,7 +125,7 @@ claude mcp add image-vision -- node /绝对路径/server.js
 
 ## "对话框直插图片"的客户端适配
 
-`read_image` 工具对任何标准 MCP 客户端**到手即用**：使用时机、图片附件引用格式（`[图片附件：名称] 图片文件：<绝对路径>`）、prompt 规则、转述要求等行为规范已**内置在工具描述里**，任何 agent 看工具描述即懂，无需额外指令文件（无需 CLAUDE.md / AGENTS.md / rules）。
+`img2text` 工具对任何标准 MCP 客户端**到手即用**：使用时机、图片附件引用格式（`[图片附件：名称] 图片文件：<绝对路径>`）、prompt 规则、转述要求等行为规范已**内置在工具描述里**，任何 agent 看工具描述即懂，无需额外指令文件（无需 CLAUDE.md / AGENTS.md / rules）。
 
 但**在对话框直接粘贴/拖拽图片发送**时，纯文本主模型收不了图片，各客户端需要一点额外适配才能"直插即读"：
 
@@ -126,17 +133,17 @@ claude mcp add image-vision -- node /绝对路径/server.js
 需要打**服务端图片降级补丁**，一条命令（自动定位 DSH 的 bundle、幂等、改前备份、改后语法校验失败自动回滚）：
 
 ```bash
-image-vision-mcp-patch            # 打补丁（安装后即有该命令；或 node patch-dsh.js）
-image-vision-mcp-patch --check    # 检查是否已打
-image-vision-mcp-patch --restore  # 回滚（从 .image-vision.bak 恢复）
+dsh-vision-mcp-patch            # 打补丁（安装后即有该命令；或 node patch-dsh.js）
+dsh-vision-mcp-patch --check    # 检查是否已打
+dsh-vision-mcp-patch --restore  # 回滚（从 .image-vision.bak 恢复）
 ```
 
-补丁把 prompt 准入从"拒绝"（MODEL_DOES_NOT_SUPPORT_IMAGES）改为**图片降级**：图片落盘为 durable attachment，消息中插入一行文本引用（`[图片附件：name（mediaType）] 图片文件：<绝对路径>`），agent 按工具描述自动调 `read_image` —— 对话框直插图片即用。
+补丁把 prompt 准入从"拒绝"（MODEL_DOES_NOT_SUPPORT_IMAGES）改为**图片降级**：图片落盘为 durable attachment，消息中插入一行文本引用（`[图片附件：name（mediaType）] 图片文件：<绝对路径>`），agent 按工具描述自动调 `img2text` —— 对话框直插图片即用。
 
-> 补丁直接改 `node_modules` 里的构建产物，**DSH 升级会被覆盖**，升级后重跑一次 `image-vision-mcp-patch` 即可。
+> 补丁直接改 `node_modules` 里的构建产物，**DSH 升级会被覆盖**，升级后重跑一次 `dsh-vision-mcp-patch` 即可。
 
 ### Claude Code
-主模型不支持图片时直插会被拒。工具描述已内置行为规范（agent 看到图片引用会自动调 `read_image`），但"直插图片自动落盘转引用"需要钩子（hook）把附件路径注入消息文本，思路同 DSH 降级：图片落盘 → 消息里出现 `[图片附件：name] 文件：<绝对路径>` → agent 调 `read_image`。
+主模型不支持图片时直插会被拒。工具描述已内置行为规范（agent 看到图片引用会自动调 `img2text`），但"直插图片自动落盘转引用"需要钩子（hook）把附件路径注入消息文本，思路同 DSH 降级：图片落盘 → 消息里出现 `[图片附件：name] 文件：<绝对路径>` → agent 调 `img2text`。
 
 ### Cursor / 其他
 工具描述已覆盖行为规范，无需额外指令；直插图片若被客户端拦截，同样需要钩子/脚本把附件转成路径文本。
@@ -180,7 +187,7 @@ $env:VISION_PROVIDERS = '[{"name":"lunora","base":"https://api.uselunora.com/v1"
 
 ## 工具说明
 
-### `read_image`
+### `img2text`
 
 | 参数 | 必填 | 说明 |
 |------|------|------|

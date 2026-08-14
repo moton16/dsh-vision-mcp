@@ -6,7 +6,7 @@
  * （MODEL_DOES_NOT_SUPPORT_IMAGES，"当前模型不支持图片"）。
  * 本补丁把该拒绝逻辑改为：图片落盘为 durable attachment，消息中插入文本引用
  * （`[图片附件：name（mediaType）] 图片文件：<绝对路径>`），
- * 由 agent 调用 mcp__image-vision__read_image 读取转述 —— 对话框直插图片即用。
+ * 由 agent 调用 mcp__dsh-vision__img2text 读取转述 —— 对话框直插图片即用。
  *
  * 用法：
  *   node patch-dsh.js                 # 自动定位并打补丁（幂等）
@@ -57,9 +57,9 @@ function findBundle() {
 function degradeFn() {
   return [
     '/**',
-    ' * 图片降级（image-vision-mcp 集成）：当前模型不支持图片输入时，不再拒绝，',
+    ' * 图片降级（dsh-vision-mcp 集成）：当前模型不支持图片输入时，不再拒绝，',
     ' * 而是把每个 image part 落盘为 durable attachment，并替换为文本引用',
-    ' * （含绝对路径），由 agent 调用 mcp__image-vision__read_image 读取转述。',
+    ' * （含绝对路径），由 agent 调用 mcp__dsh-vision__img2text 读取转述。',
     ' */',
     'async function degradeImageParts(ctx, content) {',
     `${TAB}const out = [];`,
@@ -93,7 +93,7 @@ const ADMIT_CTX_RE = /(const hasImage = content\.some\(\(part\) => part\.type ==
 const ADMIT_CTX_NEW = '$1$2' + TAB.repeat(5) + 'let effectiveContent = content;\n$3';
 const REJECT_RE = /if \(modelInfo\.inputModalities !== void 0 && !modelInfo\.inputModalities\.includes\("image"\)\) return err\(request, \{\s*code: "attachment-error",\s*message: `Model "\$\{current\.model\}" does not support image input\.`,\s*details: \{ reason: "MODEL_DOES_NOT_SUPPORT_IMAGES" \}\s*\}\);/;
 const REJECT_NEW = 'if (modelInfo.inputModalities !== void 0 && !modelInfo.inputModalities.includes("image")) {\n'
-  + TAB.repeat(8) + '// 图片降级（image-vision-mcp）：模型不支持图片时转文本引用，不再拒绝\n'
+  + TAB.repeat(8) + '// 图片降级（dsh-vision-mcp）：模型不支持图片时转文本引用，不再拒绝\n'
   + TAB.repeat(8) + 'effectiveContent = await degradeImageParts(ctx, content);\n'
   + TAB.repeat(7) + '}';
 const DURABLE_OLD = 'content: await durablePromptContent(ctx, content),';

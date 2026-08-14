@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * image-vision-mcp —— 零依赖 MCP 识图服务器（stdio 传输）
+ * dsh-vision-mcp —— 零依赖 MCP 识图服务器（stdio 传输）
  *
  * 作用：让本身不支持图片的模型（纯文本模型）获得"看图"能力。
- * 流程：主模型调用工具 read_image(image, prompt?) ->
+ * 流程：主模型调用工具 img2text(image, prompt?) ->
  *       server 读取图片（本地路径 / URL / data URL / base64）->
  *       按顺序尝试配置的视觉模型（OpenAI 兼容 /chat/completions）->
  *       把视觉模型返回的文字描述作为工具结果交回主模型继续推理。
@@ -55,7 +55,7 @@ function parseProviders() {
         }));
       }
     } catch (e) {
-      process.stderr.write(`[image-vision-mcp] VISION_PROVIDERS 不是合法 JSON，回退单套配置：${e.message}\n`);
+      process.stderr.write(`[dsh-vision-mcp] VISION_PROVIDERS 不是合法 JSON，回退单套配置：${e.message}\n`);
     }
   }
   return [{ name: defaults.model, base: defaults.baseUrl, model: defaults.model, apiKey: defaults.apiKey, reasoning: undefined }];
@@ -67,7 +67,7 @@ const defaultReasoning = process.env.VISION_REASONING && String(process.env.VISI
   : undefined;
 
 const providers = parseProviders();
-const TOOL_NAME = 'read_image';
+const TOOL_NAME = 'img2text';
 
 const DEFAULT_PROMPT = '详细描述这张图片的内容，逐字提取图中所有可见文字，并说明主要对象、空间布局、颜色与元素之间的关系以及值得注意的细节。';
 
@@ -241,7 +241,7 @@ async function handle(msg) {
       result: {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'image-vision-mcp', version: '1.1.0' },
+        serverInfo: { name: 'dsh-vision-mcp', version: '1.1.0' },
       },
     });
     return;
@@ -284,5 +284,5 @@ rl.on('line', (line) => {
 });
 
 process.stderr.write(
-  `[image-vision-mcp] ready: ${providers.map((p) => `${p.name}(${p.model}@${p.base})`).join(' , ')}\n`,
+  `[dsh-vision-mcp] ready: ${providers.map((p) => `${p.name}(${p.model}@${p.base})`).join(' , ')}\n`,
 );

@@ -1,10 +1,10 @@
 {
-  "name": "image-vision-mcp",
+  "name": "dsh-vision-mcp",
   "version": "1.2.0",
   "description": "Give your text-only LLM eyes: an MCP server that reads images via external OpenAI-compatible vision models (OpenAI, Qwen-VL, GLM, Gemini, Grok, Ollama...) with automatic provider fallback on rate-limit/errors.",
   "bin": {
-    "image-vision-mcp": "server.js",
-    "image-vision-mcp-patch": "patch-dsh.js"
+    "dsh-vision-mcp": "server.js",
+    "dsh-vision-mcp-patch": "patch-dsh.js"
   },
   "files": [
     "server.js",
@@ -33,6 +33,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/moton16/image-vision-mcp"
+    "url": "https://github.com/moton16/dsh-vision-mcp"
   }
 }

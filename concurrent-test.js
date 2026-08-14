@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * concurrent-test.js —— 验证 server.js 对多个 read_image 请求的并发处理
+ * concurrent-test.js —— 验证 server.js 对多个 img2text 请求的并发处理
  *
  * 做法：spawn server -> initialize -> 同时发出 N 个 tools/call（不等待前一个），
  * 统计全部返回的总耗时。如果 server 并发处理，N 个各耗时 1s 的请求总耗时 ≈ 1-2s；
@@ -40,12 +40,12 @@ const N = 5; // 并发请求数
   try {
     await send({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'concurrent-test', version: '0.0.1' } } });
 
-    console.log(`发送 ${N} 个并行 read_image 请求（每个 mock 响应耗时 1s）...`);
+    console.log(`发送 ${N} 个并行 img2text 请求（每个 mock 响应耗时 1s）...`);
     const t0 = Date.now();
     const results = await Promise.all(
       Array.from({ length: N }, (_, i) => send({
         jsonrpc: '2.0', id: 100 + i, method: 'tools/call',
-        params: { name: 'read_image', arguments: { image: IMAGE } },
+        params: { name: 'img2text', arguments: { image: IMAGE } },
       }))
     );
     const elapsed = Date.now() - t0;

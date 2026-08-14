@@ -2,7 +2,7 @@
 /**
  * test-client.js —— 模拟 MCP 客户端，端到端验证 server.js
  *
- * 流程：spawn server.js -> initialize -> tools/list -> tools/call(read_image) -> 校验输出 -> 退出
+ * 流程：spawn server.js -> initialize -> tools/list -> tools/call(img2text) -> 校验输出 -> 退出
  * 用法：node test-client.js <image-path-or-url-or-data-url> [prompt]
  * 环境变量：VISION_API_BASE / VISION_MODEL / VISION_API_KEY 会透传给 server
  */
@@ -53,7 +53,7 @@ function check(cond, label, detail) {
     const init = await call({ jsonrpc: '2.0', id: 1, method: 'initialize', params: {
       protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'test-client', version: '0.0.1' },
     }});
-    check(init.result && init.result.serverInfo && init.result.serverInfo.name === 'image-vision-mcp',
+    check(init.result && init.result.serverInfo && init.result.serverInfo.name === 'dsh-vision-mcp',
       'initialize 返回 serverInfo', JSON.stringify(init.result));
     check(init.result && init.result.capabilities && init.result.capabilities.tools,
       'initialize 声明 tools 能力');
@@ -63,16 +63,16 @@ function check(cond, label, detail) {
     console.log('== 2. tools/list ==');
     const list = await call({ jsonrpc: '2.0', id: 2, method: 'tools/list', params: {} });
     const tools = list.result && list.result.tools ? list.result.tools : [];
-    const readImage = tools.find((t) => t.name === 'read_image');
-    check(tools.length === 1 && !!readImage, 'tools/list 返回 read_image', JSON.stringify(tools.map((t) => t.name)));
+    const readImage = tools.find((t) => t.name === 'img2text');
+    check(tools.length === 1 && !!readImage, 'tools/list 返回 img2text', JSON.stringify(tools.map((t) => t.name)));
     check(readImage && readImage.inputSchema && Array.isArray(readImage.inputSchema.required)
-      && readImage.inputSchema.required.includes('image'), 'read_image 必填参数 image');
+      && readImage.inputSchema.required.includes('image'), 'img2text 必填参数 image');
 
-    console.log('== 3. tools/call read_image ==');
+    console.log('== 3. tools/call img2text ==');
     const args = { image: imageArg };
     if (promptArg) args.prompt = promptArg;
     const callRes = await call({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: {
-      name: 'read_image', arguments: args,
+      name: 'img2text', arguments: args,
     }}, 30000);
 
     const content = callRes.result && callRes.result.content ? callRes.result.content : [];

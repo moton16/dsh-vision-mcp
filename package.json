@@ -12,10 +12,6 @@
     "README.md",
     "LICENSE"
   ],
-  "scripts": {
-    "test": "node test-client.js test.png",
-    "test:concurrent": "node concurrent-test.js"
-  },
   "keywords": [
     "mcp",
     "model-context-protocol",

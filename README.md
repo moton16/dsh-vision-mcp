@@ -60,11 +60,11 @@ npx dsh-vision-mcp
 | 文件 | 说明 |
 |------|------|
 | `server.js` | MCP 服务器本体（stdio 传输，零依赖，含 bin 入口） |
-| `package.json` | npm 包定义（`bin: dsh-vision-mcp`） |
-| `mock-api.js` | 本地 mock 视觉 API（测试用，不真看图） |
-| `test-client.js` | MCP 协议端到端测试客户端 |
-| `concurrent-test.js` | 并发请求测试 |
-| `test.png` | 1×1 红色像素测试图片 |
+| `patch-dsh.js` | DSH 图片降级补丁脚本（bin: `dsh-vision-mcp-patch`） |
+| `package.json` | npm 包定义（两个 bin） |
+| `cordis.yml` / `cordis.patch.yml` | DSH 集成条目（MCP server 注册 + 视觉模型链配置） |
+
+> 测试工具（mock-api / test-client / concurrent-test）为本地开发件，不随仓库分发；开发验证见 `docs/DEVELOPER.md`（本地文档）。
 
 ## 环境变量
 
@@ -78,6 +78,8 @@ npx dsh-vision-mcp
 | `VISION_TIMEOUT_MS` | 否 | `120000` | 请求超时（毫秒） |
 
 ## 快速验证（本地 mock，无需任何 key）
+
+本地开发件（`docs/DEVELOPER.md` 有完整说明）：从开发备份取回 `mock-api.js` / `test-client.js` / `test.png` 后：
 
 ```powershell
 # 终端 1：启动 mock 视觉 API

@@ -22,6 +22,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const vm = require('node:vm');
+const fsp = require('fs/promises');
 
 const MARK = 'degradeImageParts';
 const BAK_SUFFIX = '.image-vision.bak';
@@ -104,7 +105,7 @@ function fail(msg) {
   process.exit(1);
 }
 
-function applyPatch(file) {
+async function applyPatch(file) {
   let src = fs.readFileSync(file, 'utf8');
   if (src.includes(MARK)) {
     console.log('already patched: ' + file);
@@ -176,10 +177,10 @@ function applyPatch(file) {
     fail('插入片段语法检查失败，未写盘：' + (e.message || e));
   }
 
-  // 备份 → 写盘
+  // 备份 → 写盘（异步 API）
   const bak = file + BAK_SUFFIX;
-  if (!fs.existsSync(bak)) fs.copyFileSync(file, bak);
-  fs.writeFileSync(file, src);
+  if (!fs.existsSync(bak)) await fsp.copyFile(file, bak);
+  await fsp.writeFile(file, src);
 
   console.log('✓ PATCHED: ' + file);
   console.log('  edits: ' + edits.join(', '));
@@ -187,7 +188,7 @@ function applyPatch(file) {
   console.log('  重启 DSH 后，对话框直插图片将自动降级为文本引用，由识图 MCP 读取。');
 }
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const explicit = args.find((a) => !a.startsWith('--'));
   const mode = args.includes('--restore') ? 'restore'
@@ -211,12 +212,15 @@ function main() {
   }
   if (mode === 'restore') {
     if (!fs.existsSync(bak)) fail('没有备份文件可恢复：' + bak);
-    fs.copyFileSync(bak, file);
+    await fsp.copyFile(bak, file);
     console.log('✓ RESTORED: ' + file);
     console.log('  (from ' + bak + ')');
     return;
   }
-  applyPatch(file);
+  await applyPatch(file);
 }
 
-main();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

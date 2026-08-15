@@ -9,7 +9,7 @@
         serverName: dsh-vision
         transport: stdio
         command: "node"
-        args: ["E:/coding2/dsh-vision-mcp/server.js"]
+        args: ["/path/to/dsh-vision-mcp/server.js"]
         env:
           VISION_PROVIDERS: !!js JSON.stringify([
             { name: 'lunora', base: 'https://api.uselunora.com/v1', model: 'grok-4.5', apiKey: process.env.LUNORA_VISION_KEY || '', reasoning: 'none' },

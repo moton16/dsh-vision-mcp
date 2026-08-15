@@ -74,7 +74,7 @@ npx dsh-vision-mcp
 | `VISION_MODEL` | 是 | `gpt-4o-mini` | 视觉模型名 |
 | `VISION_API_KEY` | 否* | 空 | API 密钥；本地 Ollama 等免 key 服务可省略 |
 | `VISION_MAX_TOKENS` | 否 | `4096` | 最大输出 token |
-| `VISION_TEMPERATURE` | 否 | `0.2` | 采样温度 |
+| `VISION_TEMPERATURE` | 否 | `0.5` | 采样温度 |
 | `VISION_TIMEOUT_MS` | 否 | `120000` | 请求超时（毫秒） |
 
 ## 快速验证（本地 mock，无需任何 key）
@@ -109,7 +109,7 @@ claude mcp add dsh-vision -- node /绝对路径/server.js
   "mcpServers": {
     "dsh-vision": {
       "command": "node",
-      "args": ["E:/Softwares/dsh-cli/Working/dsh-vision-mcp/server.js"],
+      "args": ["/path/to/dsh-vision-mcp/server.js"],
       "env": {
         "VISION_API_BASE": "https://api.openai.com/v1",
         "VISION_MODEL": "gpt-4o",

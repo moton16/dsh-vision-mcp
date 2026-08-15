@@ -35,7 +35,7 @@ const defaults = {
   baseUrl: (process.env.VISION_API_BASE || 'https://api.openai.com/v1').replace(/\/+$/, ''),
   model: process.env.VISION_MODEL || 'gpt-4o-mini',
   maxTokens: parseInt(process.env.VISION_MAX_TOKENS || '4096', 10),
-  temperature: parseFloat(process.env.VISION_TEMPERATURE || '0.2'),
+  temperature: parseFloat(process.env.VISION_TEMPERATURE || '0.5'),
   timeoutMs: parseInt(process.env.VISION_TIMEOUT_MS || '120000', 10),
 };
 

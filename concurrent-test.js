@@ -6,7 +6,7 @@
  * 统计全部返回的总耗时。如果 server 并发处理，N 个各耗时 1s 的请求总耗时 ≈ 1-2s；
  * 如果串行处理，总耗时 ≈ N 秒。
  */
-const { spawn } = require('child_process');
+const { spawn } = require('node:child_process');
 const path = require('path');
 const readline = require('readline');
 

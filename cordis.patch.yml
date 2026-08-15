@@ -1,0 +1,18 @@
+# dsh-vision-mcp bundle patch.
+# 与 cordis.yml 内容一致，供 bundle 安装（dsh plugin add）时自动读取。
+# profile 级 cordis.patch.yml 可按 id 覆盖这些行。
+
+- insert:
+    - id: mcp-dsh-vision
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: dsh-vision
+        transport: stdio
+        command: "node"
+        args: ["E:/coding2/dsh-vision-mcp/server.js"]
+        env:
+          VISION_PROVIDERS: !!js JSON.stringify([
+            { name: 'lunora', base: 'https://api.uselunora.com/v1', model: 'grok-4.5', apiKey: process.env.LUNORA_VISION_KEY || '', reasoning: 'none' },
+            { name: 'zen', base: 'https://opencode.ai/zen/v1', model: 'mimo-v2.5-free', apiKey: process.env.OPENCODE_API_KEY || '' }
+          ])
+        toolCallTimeoutMs: 180000

@@ -2,7 +2,7 @@
 /**
  * mock-api.js —— 本地模拟 OpenAI-compatible 视觉 API（仅用于测试 server.js）
  *
- * 启动：node mock-api.js   （监听 127.0.0.1:9876）
+ * 启动：node mock-api.js   （监听 localhost:9876）
  * 校验：POST /v1/chat/completions，检查请求体包含 image_url(data URL) 与 prompt，
  *       返回一段模拟识别文本（内含收到图片的字节长度，用于验证图片真的被传了过去）。
  */
@@ -64,6 +64,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  process.stderr.write(`[mock-api] listening on http://127.0.0.1:${PORT}/v1/chat/completions\n`);
+server.listen(PORT, 'localhost', () => {
+  process.stderr.write(`[mock-api] listening on http://localhost:${PORT}/v1/chat/completions\n`);
 });

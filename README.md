@@ -84,7 +84,7 @@ npx dsh-vision-mcp
 node mock-api.js
 
 # 终端 2：跑端到端测试（initialize → tools/list → tools/call）
-$env:VISION_API_BASE='http://127.0.0.1:9876/v1'
+$env:VISION_API_BASE='http://localhost:9876/v1'
 $env:VISION_MODEL='mock-vision-1'
 node test-client.js .\test.png
 ```

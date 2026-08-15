@@ -21,7 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execFileSync } = require('child_process');
+const vm = require('node:vm');
 
 const MARK = 'degradeImageParts';
 const BAK_SUFFIX = '.image-vision.bak';
@@ -141,7 +141,7 @@ function applyPatch(file) {
   }
 
   // 4. admit 增加 effectiveContent
-  const mAdmit = ADMIT_CTX_RE.exec(src);
+  const mAdmit = src.match(ADMIT_CTX_RE);
   if (mAdmit) {
     src = src.replace(ADMIT_CTX_RE, ADMIT_CTX_NEW);
     edits.push('effectiveContent');
@@ -165,16 +165,21 @@ function applyPatch(file) {
     fail('找不到 durablePromptContent 调用锚点（DSH 版本可能不匹配）');
   }
 
-  // 备份 → 写盘 → 语法校验（失败回滚）
+  // 插入片段语法校验（vm 只编译不执行；失败则中止、不写盘）
+  // 注：bundle 是 ESM，vm.Script 无法整体编译（import 语句）；
+  // 本项目只做锚点替换，改动全部落在下列插入片段上（ADMIT_CTX_NEW 的正则模板
+  // 含 $1$2$3 占位符，其实质插入语句即 `let effectiveContent = content;`）。
+  const probe = 'async function __probe__() {\n' + REJECT_NEW + '\nlet effectiveContent = content;\n}';
+  try {
+    new vm.Script(degradeFn() + probe, { filename: file });
+  } catch (e) {
+    fail('插入片段语法检查失败，未写盘：' + (e.message || e));
+  }
+
+  // 备份 → 写盘
   const bak = file + BAK_SUFFIX;
   if (!fs.existsSync(bak)) fs.copyFileSync(file, bak);
   fs.writeFileSync(file, src);
-  try {
-    execFileSync(process.execPath, ['--check', file], { stdio: 'pipe' });
-  } catch (e) {
-    fs.copyFileSync(bak, file);
-    fail('语法检查失败，已回滚：' + (e.message || e));
-  }
 
   console.log('✓ PATCHED: ' + file);
   console.log('  edits: ' + edits.join(', '));

@@ -6,7 +6,7 @@
  * 用法：node test-client.js <image-path-or-url-or-data-url> [prompt]
  * 环境变量：VISION_API_BASE / VISION_MODEL / VISION_API_KEY 会透传给 server
  */
-const { spawn } = require('child_process');
+const { spawn } = require('node:child_process');
 const path = require('path');
 const readline = require('readline');
 

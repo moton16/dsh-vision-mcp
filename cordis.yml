@@ -1,0 +1,24 @@
+# dsh-vision-mcp cordis composition entries.
+
+# 手动合并表单：把下面这段插入你的 profile 的
+# `$DSH_HOME/profiles/<profile>/cordis.patch.yml`，或用 overlay 方式应用：
+#
+#   dsh web --profile web --patch ./cordis.yml
+#
+# 插件本体通过 npm / GitHub 安装：npm i -g dsh-vision-mcp（或 dsh-vision-mcp-patch 打 DSH 降级补丁）。
+# 本文件只负责把 MCP server 注册进 DSH（通过 @deepseek-ai/dsh-mcp-client）。
+
+- insert:
+    - id: mcp-dsh-vision
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: dsh-vision
+        transport: stdio
+        command: "node"
+        args: ["E:/coding2/dsh-vision-mcp/server.js"]
+        env:
+          VISION_PROVIDERS: !!js JSON.stringify([
+            { name: 'lunora', base: 'https://api.uselunora.com/v1', model: 'grok-4.5', apiKey: process.env.LUNORA_VISION_KEY || '', reasoning: 'none' },
+            { name: 'zen', base: 'https://opencode.ai/zen/v1', model: 'mimo-v2.5-free', apiKey: process.env.OPENCODE_API_KEY || '' }
+          ])
+        toolCallTimeoutMs: 180000

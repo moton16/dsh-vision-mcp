@@ -7,3 +7,6 @@ node_modules/
 *.pem
 *.key
 credentials*
+
+# 开发者内部文档（dsh.so 审核要求仓库精简），本地专用不提交
+docs/DEVELOPER.md
